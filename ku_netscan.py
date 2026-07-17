@@ -197,28 +197,36 @@ def cloudflare_bypass():
     domain = input(f" {INFO} Enter Target Domain: ").strip()
     if not domain: return
     os.system(f"dig +short cname {domain} && dig +short mx {domain}")
-# 16. Phone Info Lookup (محدثة ومضمونة تعمل محلياً بدون سيرفر خارجي)
+
+# 16. Phone Info Lookup (إصدار ذكي يصحح الأخطاء تلقائياً)
 def phone_lookup():
     print_header("Phone Lookup", "زانیاری ژمارەی تەلەفۆن")
-    phone = input(f" {INFO} Enter Phone Number with + (e.g., +964750xxxxxxx): ").strip()
+    phone = input(f" {INFO} Enter Phone Number (e.g., 0750xxxxxxx or +964750...): ").strip()
     if not phone: return
     
+    # 🛠️ تصحيح تلقائي: إذا بدأ الرقم بـ 07 للشبكات العراقية (آسيا، كورك، زين)
+    if phone.startswith("07") and len(phone) == 11:
+        phone = "+964" + phone[1:]  # يحول 0750 إلى +964750
+    elif phone.startswith("7") and len(phone) == 10:
+        phone = "+964" + phone      # يحول 750 إلى +964750
+    elif not phone.startswith("+"):
+        phone = "+" + phone         # يضمن وجود علامة الزائد دائماً
+        
     try:
         # فحص وتحليل الرقم
         parsed_number = phonenumbers.parse(phone, None)
         
-        # التأكد إذا كان الرقم حقيقياً وصحيحاً كبنية دولية
+        # التأكد إذا كان الرقم حقيقياً كبنية دولية
         if not phonenumbers.is_valid_number(parsed_number):
             print(f"{ERR} {RED}الرقم غير صحيح أو صيغته خاطئة!{RESET}")
             return
             
-        # جلب اسم الدولة والمنطقة باللغة العربية أو الإنجليزية
+        # جلب اسم الدولة والمنطقة
         country = geocoder.description_for_number(parsed_number, "en")
         
-        # جلب اسم الشركة المشغلة (مثل Asiacell, Korek, Zain)
+        # جلب اسم الشركة المشغلة (Asiacell, Korek, Zain)
         service_provider = carrier.name_for_number(parsed_number, "en")
         
-        # طباعة النتائج بشكل مرتب
         print(f"\n{SUCC} {BOLD}{GREEN}تم جلب معلومات الرقم بنجاح:{RESET}")
         print(f" ┌───────────────────────────────────────────────────┐")
         print(f"  {INFO} International Format : {BOLD}{WHITE}{phonenumbers.format_number(parsed_number, phonenumbers.PhoneNumberFormat.INTERNATIONAL)}{RESET}")
@@ -228,7 +236,6 @@ def phone_lookup():
         
     except Exception as e:
         print(f"{ERR} {RED}حدث خطأ أثناء فحص الرقم: {e}{RESET}")
-
 # 17. Shellshock Scanner
 def shellshock_scan():
     print_header("Shellshock Scanner", "پشکنینی کلاود سێرڤەر")
