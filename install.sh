@@ -1,13 +1,18 @@
 #!/bin/bash
 
-echo "Installing MyTool..."
+# 1. إنشاء مجلد ثابت للأداة داخل النظام
+mkdir -p /usr/share/mytool
 
-sudo apt update
+# 2. نسخ كل ملفات الأداة الحالية إلى هذا المجلد الثابت
+cp -r * /usr/share/mytool/
 
-pip3 install -r requirements.txt
+# 3. إنشاء أمر اختصار في النظام باسم mytool ليقوم بتشغيلها من مجلدها الثابت
+echo '#!/bin/bash' > /usr/local/bin/mytool
+echo 'cd /usr/share/mytool && python3 ku_netscan.py "$@"' >> /usr/local/bin/mytool
 
-chmod +x main.py
+# 4. إعطاء صلاحيات التشغيل للأمر الجديد
+chmod +x /usr/local/bin/mytool
 
-sudo cp main.py /usr/local/bin/mytool
-
-echo "Installation Complete."
+echo "============================================="
+echo "  [+] Done! You can now run the tool using: mytool"
+echo "============================================="
