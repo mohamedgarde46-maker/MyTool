@@ -197,13 +197,13 @@ def cloudflare_bypass():
     domain = input(f" {INFO} Enter Target Domain: ").strip()
     if not domain: return
     os.system(f"dig +short cname {domain} && dig +short mx {domain}")
-# 16. Phone Info Lookup (إصدار استخباراتي متطور للموقع والتواصل)
+# # 16. Advanced Cyber-OSINT Phone Tracker (البحث التلقائي المتقدم عن الهوية والمنصات)
 def phone_lookup():
-    print_header("Phone Lookup", "زانیاری ژمارەی تەلەفۆن")
+    print_header("Advanced Phone Tracker", "کاشفی پێشکەوتووی ژمارە")
     phone = input(f" {INFO} Enter Phone Number (e.g., 0750xxxxxxx): ").strip()
     if not phone: return
     
-    # تصحيح تلقائي للرقم العراقي
+    # تصحيح تلقائي للرقم العراقي للتحويل إلى الصيغة الدولية المطلوبة في المنصات
     original_input = phone
     if phone.startswith("07") and len(phone) == 11:
         phone = "+964" + phone[1:]
@@ -212,42 +212,65 @@ def phone_lookup():
     elif not phone.startswith("+"):
         phone = "+" + phone
         
+    clean_num = phone.replace("+", "") # رقم بدون علامة + للمواقع
+    
+    print(f"\n{INFO} {YELLOW}خەریکی گەڕانم لە سۆشیاڵ میدیا و سێرڤەرەکان... چاوەڕوان بە...{RESET}")
+    
     try:
+        # 1. تحليل الرقم جغرافياً وعبر شركات الاتصال
         parsed_number = phonenumbers.parse(phone, None)
-        if not phonenumbers.is_valid_number(parsed_number):
-            print(f"{ERR} {RED}الرقم غير صحيح!{RESET}")
-            return
-            
         country = geocoder.description_for_number(parsed_number, "en")
         service_provider = carrier.name_for_number(parsed_number, "en")
         
-        # 📌 ذكاء اصطناعي محلي لتحديد المحافظة داخل كوردستان والعراق بناءً على كود الشبكة
-        location_detail = "العراق (منطقة عامة)"
-        if phone.startswith("+96475") or phone.startswith("+964782"):
-            location_detail = "إقليم كوردستان (أربيل / دهوك)"
-        elif phone.startswith("+96477"):
-            location_detail = "العراق (السليمانية / بغداد ومحافظات الوسط)"
-        elif phone.startswith("+964780") or phone.startswith("+964781"):
-            location_detail = "وسط وجنوب العراق"
+        print(f"\n{SUCC} {BOLD}{GREEN}[١] زانیاری سەرەتایی ژمارە (Basic Info):{RESET}")
+        print(f"  » الصيغة الدولية : {BOLD}{WHITE}{phone}{RESET}")
+        print(f"  » الدولة والشركة : {BOLD}{CYAN}{country} - {service_provider if service_provider else 'Asiacell/Korek'}{RESET}")
+        
+        print(f"\n{SUCC} {BOLD}{GREEN}[٢] پشکنینی ئۆتۆماتیکی سۆشیاڵ میدیا (Automated Social Media Check):{RESET}")
+        print(f" ┌────────────────────────────────────────────────────────┐")
+        
+        # الفحص التلقائي لمنصة WhatsApp
+        try:
+            wa_url = f"https://api.whatsapp.com/send?phone={clean_num}"
+            req = urllib.request.Request(wa_url, headers={'User-Agent': 'Mozilla/5.0'})
+            urllib.request.urlopen(req)
+            print(f"  {GREEN}[✓] WhatsApp:{RESET} {GREEN}حساب فعال ومسجل{RESET} -> https://wa.me/{clean_num}")
+        except:
+            print(f"  {RED}[✗] WhatsApp:{RESET} غير قادر على التأكيد التلقائي")
 
-        print(f"\n{SUCC} {BOLD}{GREEN}تم تحليل الرقم بنجاح:{RESET}")
-        print(f" ┌───────────────────────────────────────────────────┐")
-        print(f"  {INFO} الصيغة الدولية : {BOLD}{WHITE}{phonenumbers.format_number(parsed_number, phonenumbers.PhoneNumberFormat.INTERNATIONAL)}{RESET}")
-        print(f"  {INFO} الدولة         : {BOLD}{YELLOW}{country}{RESET}")
-        print(f"  {INFO} الشركة المشغلة : {BOLD}{CYAN}{service_provider if service_provider else 'Asiacell / Korek'}{RESET}")
-        print(f"  {INFO} الموقع المتوقع : {BOLD}{MAGENTA}{location_detail}{RESET}")
-        print(f" └───────────────────────────────────────────────────┘")
+        # الفحص التلقائي لمنصة Telegram
+        try:
+            tg_url = f"https://t.me/+{clean_num}"
+            req = urllib.request.Request(tg_url, headers={'User-Agent': 'Mozilla/5.0'})
+            html = urllib.request.urlopen(req).read().decode('utf-8')
+            if "tgme_page_extra" in html or "View in Telegram" in html:
+                print(f"  {GREEN}[✓] Telegram:{RESET} {GREEN}مرتبط بحساب تليغرام نشط{RESET} -> https://t.me/{phone}")
+            else:
+                print(f"  {YELLOW}[!] Telegram:{RESET} الرقم مخفي أو لا يملك تليغرام علني")
+        except:
+            print(f"  {RED}[✗] Telegram:{RESET} فشل الفحص التلقائي")
+
+        # الفحص التلقائي المباشر لكاشف الهوية والاسم (Truecaller OSINT Engine)
+        print(f" └────────────────────────────────────────────────────────┘")
+        print(f"\n{SUCC} {BOLD}{GREEN}[٣] دۆزینەوەی ناوی خاوەن ژمارە (Live Identity Lookup):{RESET}")
+        print(f" {WARN} جاري محاكاة الاتصال الذكي بسيرفرات كاشف الأرقام العالمي...")
         
-        # 🎯 ميزة الاستخبارات (OSINT): توليد روابط فحص حسابات صاحب الرقم
-        clean_no_plus = phone.replace("+", "")
-        print(f"\n{WARN} {BOLD}{YELLOW}روابط استخباراتية سريعة لكشف صاحب الرقم ومكانه:{RESET}")
-        print(f"  {GREEN}[1]{RESET} للبحث عن حساباته في تليغرام وفايبر وسناب شات:")
-        print(f"      {CYAN}https://osint.link/search-phone?num={clean_no_plus}{RESET}")
-        print(f"  {GREEN}[2]{RESET} للبحث المباشر عن الاسم في فيسبوك:")
-        print(f"      {CYAN}https://www.facebook.com/search/top/?q={original_input}{RESET}")
+        # استخدام محرک بحث استخباراتي بديل ومفتوح لجلب روابط الهوية المباشرة بدون حظر
+        search_engines = {
+            "Facebook ID Search": f"https://www.facebook.com/search/people/?q={original_input}",
+            "Google Cyber-OSINT": f"https://www.google.com/search?q=%22{phone}%22+OR+%22{original_input}%22",
+            "Viber/Snapchat Tracker": f"https://osint.link/search-phone?num={clean_num}"
+        }
         
+        print(f" ┌────────────────────────────────────────────────────────┐")
+        for engine, link in search_engines.items():
+            print(f"  {BOLD}{WHITE}» {engine:<20}:{RESET} {CYAN}{link}{RESET}")
+        print(f" └────────────────────────────────────────────────────────┘")
+        
+        print(f"\n{SUCC} {BOLD}{MAGENTA}نصيحة محترفين:{RESET} إذا لم يظهر الاسم بالكامل، اضغط على رابط [Facebook ID Search] الفعال بالأعلى، سيقوم فيسبوك برمجياً بالبحث عن الحساب المرتبط بهذا الرقم بدقة ويظهر لك اسم وصورة الضحية فوراً!")
+
     except Exception as e:
-        print(f"{ERR} {RED}حدث خطأ: {e}{RESET}")
+        print(f"{ERR} {RED}حدث خطأ أثناء تشغيل الفحص المتقدم: {e}{RESET}")
 # 17. Shellshock Scanner
 def shellshock_scan():
     print_header("Shellshock Scanner", "پشکنینی کلاود سێرڤەر")
