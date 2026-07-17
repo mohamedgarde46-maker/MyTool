@@ -4,20 +4,22 @@ import sys
 import socket
 import subprocess
 
-# ألوان ANSI الكلاسيكية - مضمونة وتعمل على أي ترمينال بدون تشويه الخطوط
+# ألوان ANSI الكلاسيكية
 GREEN = '\033[92m'
 RED = '\033[91m'
 YELLOW = '\033[93m'
 CYAN = '\033[96m'
 RESET = '\033[0m'
 
+# تغيير الاسم والبانر إلى Kurdistan
 BANNER = f"""{GREEN}
-  _  __       _   _      _                      
- | |/ /_  _  | \\ | | ___| |_ ___  ___ __ _ _ __  
- | ' /| | | ||  \\| |/ _ \\ __/ __|/ __/ _` | '_ \\ 
- | . \\| |_| || |\\  |  __/ |_\\__ \\ (_| (_| | | | |
- |_|\\_\\\\__,_||_| \\_|\\___|\\__|___/\\___\\__,_|_| |_|
-{CYAN} [+] Multi-Tool Framework | Created by Mohamedgarde46-Maker {RESET}
+  _  __              _ _     _              
+ | |/ /_  _ _ __  __| (_)___| |_ __ _ _ __  
+ | ' /| | | | '__|/ _` | / __| __/ _` | '_ \\ 
+ | . \| |_| | |  | (_| | \__ \\ || (_| | | | |
+ |_|\_\\\\__,_|_|   \__,_|_|___/\__\__,_|_| |_|
+                                            
+{CYAN} [+] Kurdistan Multi-Tool Framework | Created by Mohamedgarde46-Maker {RESET}
 """
 
 def check_root():
@@ -25,13 +27,12 @@ def check_root():
         print(f"{RED}[-] تکایه ئامرازه که وه ک root کارپیبکه (sudo mytool){RESET}")
         sys.exit(1)
 
-# 1. فحص الشبكة المحلية العادي
+# 1. فحص الشبكة المحلية المطور (يفحص كل الأجهزة بدقة)
 def network_scanner():
     print(f"\n{YELLOW}>> ئامرازی پشکنینی تۆر (Network Scanner){RESET}")
-    ip_range = input("Enter IP Range (e.g., 192.168.1.1/24): ").strip()
-    if not ip_range: return
     print(f"{GREEN}[+] خەریکی پشکنینم، تکایە چاوەڕوان بە...{RESET}")
-    os.system(f"arp-scan --interface=eth0 {ip_range} 2>/dev/null || arp-scan -l")
+    # الفحص بدون تحديد واجهة إجبارية ليجلب كل شيء متصل بالواي فاي والكيبل
+    os.system("arp-scan --localnet 2>/dev/null || arp-scan -l")
 
 # 2. فحص البورتات
 def port_scanner():
@@ -86,38 +87,27 @@ def whois_lookup():
     print(f"{GREEN}[+] خەریکی هێنانی زانیاریم...{RESET}")
     os.system(f"whois {domain} | grep -E 'Domain Name|Registrar|Creation Date|Expir'")
 
-# 6. الأداة الجديدة: فحص الأجهزة (Device Scanner)
+# 6. فحص الأجهزة قووڵ
 def device_scanner():
     print(f"\n{YELLOW}>> ئامرازی پشکنینی ئامێرەکان (Device Scanner){RESET}")
     target = input("Enter Target IP (e.g., 192.168.1.5): ").strip()
     if not target: return
     print(f"{GREEN}[+] خەریکی پشکنینی قووڵی ئامێرەکەم...{RESET}")
-    # فحص نظام التشغيل التخميني للأجهزة عبر Ping TTL والمنفذ المفتوح
-    os.system(f"nmap -O -F {target} 2>/dev/null || nmap -F {target}")
+    os.system(f"nmap -F {target}")
 
-# 7. الأداة الجديدة: كم واحد على الشبكة (Network Users Count)
+# 7. حل مشكلة العدد الناقص وفحص الشبكة بالكامل
 def network_count():
     print(f"\n{YELLOW}>> پشکنینی ژمارەی ئامێرەکان لەسەر تۆڕ (Network Count){RESET}")
-    print(f"{GREEN}[+] خەریکی پشکنینی سەرجەم تۆڕەکەم بۆ دۆزینەوەی هەموو ئامێرەکان...{RESET}")
+    print(f"{GREEN}[+] خەریکی پشکنینی گشتی و دۆزینەوەی هەموو ئامێرەکانم...{RESET}\n")
     
-    # الحصول على الآي بي الافتراضي للشبكة
-    try:
-        cmd = "ip route | grep default | awk '{print $3}'"
-        gateway = subprocess.check_output(cmd, shell=True).decode().strip()
-        network_prefix = ".".join(gateway.split(".")[:3]) + ".0/24"
-    except:
-        network_prefix = "192.168.1.0/24" # افتراضي في حال فشل التلقائي
-        
-    print(f"{CYAN}[*] Scanning Target Network: {network_prefix}{RESET}\n")
-    
-    # فحص صارم وعد الأجهزة المتصلة
-    output = subprocess.check_output(f"arp-scan --interface=eth0 {network_prefix} 2>/dev/null || arp-scan -l", shell=True).decode()
+    # الفحص الشامل عبر الإعدادات المحلية التلقائية لضمان التقاط الـ 5 أجهزة كاملة
+    output = subprocess.check_output("arp-scan --localnet 2>/dev/null || arp-scan -l", shell=True).decode()
     print(output)
     
-    # حساب عدد الأجهزة المكتشفة في المخرجات
+    # حساب عدد الأجهزة بدقة من المخرجات المكتوبة
     devices_count = 0
     for line in output.split('\n'):
-        if "responded" in line or "packets received" in line:
+        if "responded" in line or "packets received" in line or "Interface" in line:
             continue
         if any(char.isdigit() for char in line) and ":" in line:
             devices_count += 1
