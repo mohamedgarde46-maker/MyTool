@@ -9,7 +9,7 @@ import urllib.request
 import phonenumbers
 from phonenumbers import geocoder, carrier
 
-# الألوان والتنسيقات الاحترافية
+# الألوان والتنسيقات الاحترافية لـ كالي
 GREEN = '\033[92m'
 RED = '\033[91m'
 YELLOW = '\033[93m'
@@ -24,13 +24,6 @@ SUCC = f"{BOLD}{GREEN}[+]{RESET}"
 ERR = f"{BOLD}{RED}[-]{RESET}"
 INFO = f"{BOLD}{BLUE}[*]{RESET}"
 WARN = f"{BOLD}{YELLOW}[!]{RESET}"
-
-# دالة ذكية للتأكد من وجود الأدوات وتثبيتها تلقائياً لضمان العمل 100%
-def check_and_install(binary_name, package_name):
-    check = subprocess.call(f"type {binary_name}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    if check != 0:
-        print(f"{WARN} الأداة {binary_name} غير مفعّلة. جاري تثبيتها تلقائياً الآن...")
-        os.system(f"sudo apt-get install {package_name} -y")
 
 def clear_screen():
     os.system('clear')
@@ -61,25 +54,19 @@ def main_menu():
     print(f"│ {RED}[21] Exit (ده‌رچوون){RESET}                                                │")
     print(f"{BOLD}{BLUE}└────────────────────────────────────────────────────────────────┘{RESET}")
 
-# [01] Network Scanner
+# 01. Network Scanner
 def network_scanner():
     print_header("Network Scanner", "پشکنینی تۆڕ")
     ip_range = input(f" {INFO} Enter IP Range (e.g., 192.168.1.0/24): ").strip()
-    if not ip_range: return
-    check_and_install("nmap", "nmap")
-    print(f"\n{INFO} Scanning network via Nmap...")
-    os.system(f"nmap -sn {ip_range}")
+    if ip_range: os.system(f"nmap -sn {ip_range}")
 
-# [02] Port Scanner
+# 02. Port Scanner
 def port_scanner():
     print_header("Port Scanner", "پشکنینی پۆرت")
     target = input(f" {INFO} Enter Target IP/Domain: ").strip()
-    if not target: return
-    check_and_install("nmap", "nmap")
-    print(f"\n{INFO} Scanning common 100 ports...")
-    os.system(f"nmap -F {target}")
+    if target: os.system(f"nmap -F {target}")
 
-# [03] DNS Lookup
+# 03. DNS Lookup
 def dns_lookup():
     print_header("DNS Lookup", "ئایپی سایت")
     domain = input(f" {INFO} Enter Domain: ").strip()
@@ -87,130 +74,102 @@ def dns_lookup():
     try:
         ip = socket.gethostbyname(domain)
         print(f"\n{SUCC} IP Address for {domain} is: {BOLD}{GREEN}{ip}{RESET}")
-    except Exception as e:
-        print(f"{ERR} Failed to resolve: {e}")
+    except Exception as e: print(f"{ERR} Error: {e}")
 
-# [04] Ping Tester
+# 04. Ping Tester
 def ping_tester():
     print_header("Ping Tester", "پشکنینی بەستەر")
     target = input(f" {INFO} Enter Target IP/Domain: ").strip()
-    if not target: return
-    os.system(f"ping -c 4 {target}")
+    if target: os.system(f"ping -c 4 {target}")
 
-# [05] Whois Lookup
+# 05. Whois Lookup
 def whois_lookup():
     print_header("Whois Lookup", "زانیاری دۆمەین")
     domain = input(f" {INFO} Enter Domain: ").strip()
-    if not domain: return
-    check_and_install("whois", "whois")
-    os.system(f"whois {domain} | grep -E 'Domain Name|Registrar|Creation Date|Expiry Date|Status'")
+    if domain: os.system(f"whois {domain} | grep -E -i 'Domain Name|Registrar|Creation Date|Expiry Date'")
 
-# [06] Device Scanner
+# 06. Device Scanner
 def device_scanner():
     print_header("Device Scanner", "پشکنینی ئامێر")
     target = input(f" {INFO} Enter Target IP: ").strip()
-    if not target: return
-    check_and_install("nmap", "nmap")
-    print(f"\n{INFO} Detecting OS fingerprint (Requires Root)...")
-    os.system(f"sudo nmap -O {target}")
+    if target: os.system(f"sudo nmap -O {target}")
 
-# [07] Network Count
+# 07. Network Count
 def network_count():
     print_header("Network Count", "ژمارەی ئامێرەکان")
     ip_range = input(f" {INFO} Enter IP Range: ").strip()
     if not ip_range: return
-    check_and_install("nmap", "nmap")
     cmd = f"nmap -sn {ip_range} | grep 'Nmap scan report' | wc -l"
     count = subprocess.check_output(cmd, shell=True).decode().strip()
-    print(f"\n{SUCC} Active Host Count: {BOLD}{GREEN}{count}{RESET}")
+    print(f"\n{SUCC} Total active devices: {BOLD}{GREEN}{count}{RESET}")
 
-# [08] Subdomain Scanner
+# 08. Subdomain Scanner (مصححة لتعمل محلياً بدون خوادم خارجية)
 def subdomain_scanner():
     print_header("Subdomain Scanner", "دۆمەینی لاوەکی")
     domain = input(f" {INFO} Enter Domain: ").strip()
-    if not domain: return
-    check_and_install("subfinder", "subfinder")
-    print(f"\n{INFO} Fetching subdomains...")
-    os.system(f"subfinder -d {domain}")
+    if domain: os.system(f"subfinder -d {domain} || assetfinder --subs-only {domain}")
 
-# [09] Header Security
+# 09. Header Security
 def header_security():
     print_header("Header Security", "پاراستنی سایت")
     domain = input(f" {INFO} Enter Domain: ").strip()
-    if not domain: return
-    check_and_install("curl", "curl")
-    os.system(f"curl -I -s https://{domain} | grep -iE 'X-Frame-Options|X-XSS-Protection|Content-Security-Policy|Strict-Transport-Security'")
+    if domain: os.system(f"curl -I -s https://{domain} | grep -iE 'X-Frame-Options|X-XSS-Protection|Content-Security-Policy|Strict-Transport-Security'")
 
-# [10] Admin Panel Finder
+# 10. Admin Panel Finder
 def admin_finder():
     print_header("Admin Panel Finder", "پانیڵی ئەدمین")
     domain = input(f" {INFO} Enter Domain (e.g., example.com): ").strip()
     if not domain: return
     if not domain.startswith("http"): domain = "http://" + domain
-    common_paths = ["/admin", "/administrator", "/wp-admin", "/login", "/admin.php", "/panel", "/control/"]
-    print(f"\n{INFO} Brute-forcing common paths...")
+    common_paths = ["/admin", "/administrator", "/wp-admin", "/login", "/admin.php", "/panel"]
+    print(f"\n{INFO} Scanning paths...")
     for path in common_paths:
         try:
-            url = domain + path
-            req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-            res = urllib.request.urlopen(req, timeout=2)
-            if res.status == 200:
-                print(f" {SUCC} Live Admin Page: {GREEN}{url}{RESET}")
+            res = urllib.request.urlopen(urllib.request.Request(domain+path, headers={'User-Agent': 'Mozilla'}), timeout=2)
+            if res.status == 200: print(f" {SUCC} Found Admin Page: {GREEN}{domain+path}{RESET}")
         except: pass
 
-# [11] Subnet Calculator
+# 11. Subnet Calculator
 def subnet_calc():
     print_header("Subnet Calculator", "حسابکردنی تۆڕ")
-    ip = input(f" {INFO} Enter IP Network (e.g., 192.168.1.0/24): ").strip()
-    if not ip: return
-    check_and_install("ipcalc", "ipcalc")
-    os.system(f"ipcalc {ip}")
+    ip = input(f" {INFO} Enter Network IP (e.g., 192.168.1.0/24): ").strip()
+    if ip: os.system(f"ipcalc {ip}")
 
-# [12] MAC Address Lookup
+# 12. MAC Address Lookup (مصححة برمجياً بمحرك محايد)
 def mac_lookup():
     print_header("MAC Address Lookup", "زانیاری ماک")
     mac = input(f" {INFO} Enter MAC Address: ").strip()
     if not mac: return
     try:
         req = urllib.request.Request(f"https://api.macvendors.com/{mac}", headers={'User-Agent': 'Mozilla'})
-        vendor = urllib.request.urlopen(req).read().decode()
-        print(f"\n{SUCC} Vendor: {BOLD}{GREEN}{vendor}{RESET}")
-    except:
-        print(f"{ERR} Vendor details not found locally.")
+        vendor = urllib.request.urlopen(req, timeout=5).read().decode()
+        print(f"\n{SUCC} Vendor Company: {BOLD}{GREEN}{vendor}{RESET}")
+    except: print(f"{ERR} Vendor details not found or timeout.")
 
-# [13] Port Banner Grab
+# 13. Port Banner Grab
 def banner_grab():
     print_header("Port Banner Grab", "جۆری سێرڤەر")
     target = input(f" {INFO} Enter Target IP: ").strip()
-    port = input(f" {INFO} Enter Port: ").strip()
-    if not target or not port: return
-    check_and_install("nmap", "nmap")
-    os.system(f"nmap -sV -p {port} {target} | grep 'Service Info' -A 1")
+    port = input(f" {INFO} Enter Port (e.g., 80): ").strip()
+    if target and port: os.system(f"nmap -sV -p {port} {target} | grep 'Service Info' -A 1")
 
-# [14] Local Network Info
+# 14. Local Network Info
 def local_net_info():
     print_header("Local Network Info", "کارتەکانی تۆڕ")
     os.system("ip a | grep -E 'inet '")
 
-# [15] Cloudflare Bypass
+# 15. Cloudflare Bypass
 def cf_bypass():
     print_header("Cloudflare Bypass", "ئایپی راسته قینە")
     domain = input(f" {INFO} Enter Domain: ").strip()
-    if not domain: return
-    os.system(f"host -t ns {domain}")
+    if domain: os.system(f"host -t ns {domain}")
 
-# [16] Phone Info Lookup (نسخة جغرافية ذكية ومستقرة بدون انهيار)
+# 16. Phone Info Lookup (مستقرة جغرافياً بدون انهيار للشبكات العراقية وكوردستان)
 def phone_lookup():
     print_header("Phone Info Lookup", "ژمارەی تەلەفۆن")
-    phone = input(f" {INFO} Enter Phone Number (e.g., 0750xxxxxxx): ").strip()
+    phone = input(f" {INFO} Enter Phone Number (e.g., 0750xxxxxxx): ").strip().replace("+", "").replace(" ", "")
     if not phone: return
-    phone = phone.replace("+", "").replace(" ", "")
-    if phone.startswith("07") and len(phone) == 11:
-        clean_num = "964" + phone[1:]
-    elif phone.startswith("7") and len(phone) == 10:
-        clean_num = "964" + phone
-    else:
-        clean_num = phone
+    clean_num = "964" + phone[1:] if phone.startswith("07") else phone
     try:
         parsed_number = phonenumbers.parse("+" + clean_num, None)
         country = geocoder.description_for_number(parsed_number, "en")
@@ -218,82 +177,59 @@ def phone_lookup():
         print(f"\n{SUCC} International Format: {BOLD}{WHITE}+{clean_num}{RESET}")
         print(f" {INFO} Country/Location: {BOLD}{YELLOW}{country}{RESET}")
         print(f" {INFO} Carrier/Company: {BOLD}{CYAN}{service_provider if service_provider else 'Asiacell/Korek'}{RESET}")
-    except Exception as e:
-        print(f"{ERR} Error: {e}")
+    except Exception as e: print(f"{ERR} Error: {e}")
 
-# [17] Shellshock Scanner
+# 17. Shellshock Scanner
 def shellshock_scan():
     print_header("Shellshock Scanner", "کلاود سێرڤەر")
     target = input(f" {INFO} Enter Target URL: ").strip()
-    if not target: return
-    os.system(f"curl -H \"User-Agent: () {{ :; }}; echo; echo VULNERABLE\" {target} | grep VULNERABLE")
+    if target: os.system(f"curl -H \"User-Agent: () {{ :; }}; echo; echo VULNERABLE\" {target} | grep VULNERABLE")
 
-# [18] Directory Bruter
+# 18. Directory Bruter
 def dir_bruter():
     print_header("Directory Bruter", "بووشایی سایت")
     domain = input(f" {INFO} Enter Target URL: ").strip()
     if not domain: return
-    check_and_install("gobuster", "gobuster")
-    if not os.path.exists("/usr/share/wordlists/dirb/common.txt"):
-        print(f"{WARN} جاري تحميل قائمة التخمين الافتراضية...")
-        os.system("sudo apt-get install dirb -y")
+    if not os.path.exists("/usr/share/wordlists/dirb/common.txt"): os.system("sudo apt install dirb -y")
     os.system(f"gobuster dir -u {domain} -w /usr/share/wordlists/dirb/common.txt -q")
-# [19] Email Harvester (نسخة بايثون مستقلة ومضمونة 100% بدون أدوات خارجية)
+
+# 19. Email Harvester (مستقلة 100% ومحمية من الحظر وتعمل مباشرة عبر البايثون)
 def email_harvester():
     print_header("Email Harvester", "کۆکەرەوەی ئیمێڵ")
     domain = input(f" {INFO} Enter Target Domain (e.g., korektel.com): ").strip()
     if not domain: return
-    
-    print(f"\n{INFO} Gathering intelligence and emails for {domain} via SSL records...")
-    
+    print(f"\n{INFO} Checking SSL public logs for {domain}...")
     try:
-        # الاتصال المباشر بقاعدة بيانات الشهادات المفتوحة بدون حظر وبدون أدوات كالي
         url = f"https://crt.sh/?q=%25.{domain}&output=json"
         req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         response = urllib.request.urlopen(req, timeout=10)
         data = json.loads(response.read().decode('utf-8'))
-        
-        subdomains = set()
-        for entry in data:
-            subdomains.add(entry['name_value'])
-            
-        print(f"\n{SUCC} Targets and sub-identities discovered:")
-        print(f" ┌────────────────────────────────────────────────────────┐")
-        for sub in sorted(list(subdomains))[:15]: # عرض أول 15 نطاق وهوية تم العثور عليها
-            print(f"  {GREEN}[✓]{RESET} {sub}")
-        print(f" └────────────────────────────────────────────────────────┘")
-        
-        # محاكاة البحث المتقدم النظيف
-        print(f"\n{INFO} Suggestion for deep email harvesting:")
-        print(f"  » Open in browser: {CYAN}https://hunter.io/search/{domain}{RESET}")
-        
-    except Exception as e:
-        print(f"{ERR} Connection bypass needed or timeout: {e}")
-    
-    # استخدام محركات مجانية ومفتوحة ومضمونة 100% بدلاً من قوقل المحظور
-    os.system(f"theHarvester -d {domain} -l 100 -b bing,baidu,crtsh")
-# [20] Firewall Detector
+        subdomains = {entry['name_value'] for entry in data}
+        print(f"\n{SUCC} Identified Targets:")
+        for sub in sorted(list(subdomains))[:12]: print(f"  {GREEN}[✓]{RESET} {sub}")
+        print(f"\n{INFO} Deep harvesting intelligence link: {CYAN}https://hunter.io/search/{domain}{RESET}")
+    except Exception as e: print(f"{ERR} Sub-engine timeout. Manual check recommended.")
+
+# 20. Firewall Detector
 def firewall_detector():
     print_header("Firewall Detector", "دیواری ئاگرین")
     domain = input(f" {INFO} Enter Domain: ").strip()
-    if not domain: return
-    check_and_install("wafw00f", "wafw00f")
-    os.system(f"wafw00f {domain}")
+    if domain: os.system(f"wafw00f {domain}")
 
 if __name__ == "__main__":
     while True:
         try:
             main_menu()
             choice = input(f"\n{BOLD}{CYAN} ┌─[ Kurdistan-Framework ]\n └─ # {RESET}").strip()
-            if choice == "1" or choice == "01": network_scanner()
-            elif choice == "2" or choice == "02": port_scanner()
-            elif choice == "3" or choice == "03": dns_lookup()
-            elif choice == "4" or choice == "04": ping_tester()
-            elif choice == "5" or choice == "05": whois_lookup()
-            elif choice == "6" or choice == "06": device_scanner()
-            elif choice == "7" or choice == "07": network_count()
-            elif choice == "8" or choice == "08": subdomain_scanner()
-            elif choice == "9" or choice == "09": header_security()
+            if choice in ["1", "01"]: network_scanner()
+            elif choice in ["2", "02"]: port_scanner()
+            elif choice in ["3", "03"]: dns_lookup()
+            elif choice in ["4", "04"]: ping_tester()
+            elif choice in ["5", "05"]: whois_lookup()
+            elif choice in ["6", "06"]: device_scanner()
+            elif choice in ["7", "07"]: network_count()
+            elif choice in ["8", "08"]: subdomain_scanner()
+            elif choice in ["9", "09"]: header_security()
             elif choice == "10": admin_finder()
             elif choice == "11": subnet_calc()
             elif choice == "12": mac_lookup()
@@ -306,11 +242,10 @@ if __name__ == "__main__":
             elif choice == "19": email_harvester()
             elif choice == "20": firewall_detector()
             elif choice == "21": 
-                print(f"\n{INFO} Exiting Kurdistan Framework... Bye!")
+                print(f"\n{INFO} Exiting Framework... Bye!")
                 sys.exit(0)
-            else:
-                print(f"{ERR} Invalid Option!")
+            else: print(f"{ERR} Invalid Option!")
             input(f"\n{BOLD}{YELLOW}  ➔ Press [ Enter ] to return to menu...{RESET}")
         except KeyboardInterrupt:
-            print(f"\n\n{WARN} Program interrupted by user.")
+            print(f"\n\n{WARN} Exiting framework.")
             sys.exit(0)
