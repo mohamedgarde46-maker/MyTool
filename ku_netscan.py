@@ -349,3 +349,52 @@ def main():
 
 if __name__ == "__main__":
     main()
+import sys
+# استدعاء الفانكشن التي قمنا بعملها سابقاً للغة الكردية
+import arabic_reshaper
+from bidi.algorithm import get_display
+
+def fix_text(text):
+    return get_display(arabic_reshaper.reshape(text))
+
+# --- هنا نضع الأدوات الفرعية ---
+
+def network_scanner():
+    print(fix_text("خەریکی پشکنینی تۆڕەکەم..."))
+    # ضع هنا كود فحص الشبكة القديم الخاص بك
+
+def port_scanner():
+    print(fix_text("خەریکی پشکنینی پۆرتەکانم..."))
+    # هنا ستكتب كود أداة فحص البورتات الجديدة (سنشرحها بالأسفل)
+
+def ip_finder():
+    print(fix_text("دۆزینەوەی ناونیشانی IP..."))
+    # هنا ستكتب كود أداة معرفة الآي بي
+
+# --- القائمة الرئيسية ---
+def main_menu():
+    while True:
+        print("\n==============================")
+        print(fix_text(" تکایە ئامرازێک هەڵبژێرە:"))
+        print("1. Network Scanner (پشکنینی تۆڕ)")
+        print("2. Port Scanner (پشکنینی پۆرت)")
+        print("3. IP Finder (دۆزینەوەی ئایپی)")
+        print("4. Exit (دەرچوون)")
+        print("==============================")
+        
+        choice = input(" -> ")
+        
+        if choice == '1':
+            network_scanner()
+        elif choice == '2':
+            port_scanner()
+        elif choice == '3':
+            ip_finder()
+        elif choice == '4':
+            print(fix_text("ماڵاوا!"))
+            sys.exit()
+        else:
+            print(fix_text("هەڵبژاردنەکە هەڵەیە، دووبارە هەوڵ بدەرەوە."))
+
+if __name__ == "__main__":
+    main_menu()
