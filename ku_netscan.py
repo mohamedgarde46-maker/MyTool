@@ -185,11 +185,24 @@ def mac_lookup():
         print(f"\n{SUCC} Manufacturer Vendor: {BOLD}{GREEN}{vendor}{RESET}")
     except: print(f"{ERR} MAC not found or API Limit reached.")
 
-# 13. Port Banner Grabbing
+## 13. Port Banner Grabbing (مصححة ومضمونة ضد الضغط بالخطأ)
 def banner_grabbing():
     print_header("Banner Grabbing", "جۆری سێرڤەر")
     target = input(f" {INFO} Enter IP/Domain: ").strip()
-    port = int(input(f" {INFO} Enter Port (e.g., 22 or 80): ").strip())
+    if not target: return
+    
+    port_input = input(f" {INFO} Enter Port (Default is 80): ").strip()
+    
+    # ⚠️ إذا ضغطت Enter بدون كتابة شيء، سيختار تلقائياً بورت 80 ولن ينهار البرنامج
+    if not port_input:
+        port = 80
+    else:
+        try:
+            port = int(port_input)
+        except ValueError:
+            print(f"{ERR} {RED}Error: البورت يجب أن يكون رقماً فقط!{RESET}")
+            return
+
     try:
         s = socket.socket()
         s.settimeout(2.0)
@@ -198,7 +211,8 @@ def banner_grabbing():
             s.send(b"GET / HTTP/1.1\r\nHost: localhost\r\n\r\n")
         banner = s.recv(1024).decode(errors='ignore').strip()
         print(f"\n{SUCC} Server Response:\n{CYAN}{banner}{RESET}")
-    except Exception as e: print(f"{ERR} Could not grab banner: {e}")
+    except Exception as e: 
+        print(f"{ERR} Could not grab banner: {e}")
 
 # 14. Local Network Info
 def local_info():
