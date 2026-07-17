@@ -197,16 +197,37 @@ def cloudflare_bypass():
     domain = input(f" {INFO} Enter Target Domain: ").strip()
     if not domain: return
     os.system(f"dig +short cname {domain} && dig +short mx {domain}")
-
-# 16. Phone Info Lookup
+# 16. Phone Info Lookup (محدثة ومضمونة تعمل محلياً بدون سيرفر خارجي)
 def phone_lookup():
     print_header("Phone Lookup", "زانیاری ژمارەی تەلەفۆن")
-    phone = input(f" {INFO} Enter Phone Number: ").strip()
+    phone = input(f" {INFO} Enter Phone Number with + (e.g., +964750xxxxxxx): ").strip()
     if not phone: return
+    
     try:
-        res = urllib.request.urlopen(f"https://html.nu/api/phone.php?number={phone}").read().decode()
-        print(f"{SUCC} Data: {GREEN}{res}{RESET}")
-    except: print(f"{ERR} Error fetching phone data.")
+        # فحص وتحليل الرقم
+        parsed_number = phonenumbers.parse(phone, None)
+        
+        # التأكد إذا كان الرقم حقيقياً وصحيحاً كبنية دولية
+        if not phonenumbers.is_valid_number(parsed_number):
+            print(f"{ERR} {RED}الرقم غير صحيح أو صيغته خاطئة!{RESET}")
+            return
+            
+        # جلب اسم الدولة والمنطقة باللغة العربية أو الإنجليزية
+        country = geocoder.description_for_number(parsed_number, "en")
+        
+        # جلب اسم الشركة المشغلة (مثل Asiacell, Korek, Zain)
+        service_provider = carrier.name_for_number(parsed_number, "en")
+        
+        # طباعة النتائج بشكل مرتب
+        print(f"\n{SUCC} {BOLD}{GREEN}تم جلب معلومات الرقم بنجاح:{RESET}")
+        print(f" ┌───────────────────────────────────────────────────┐")
+        print(f"  {INFO} International Format : {BOLD}{WHITE}{phonenumbers.format_number(parsed_number, phonenumbers.PhoneNumberFormat.INTERNATIONAL)}{RESET}")
+        print(f"  {INFO} Country / Location    : {BOLD}{YELLOW}{country}{RESET}")
+        print(f"  {INFO} Company / Carrier     : {BOLD}{CYAN}{service_provider if service_provider else 'Unknown/Landline'}{RESET}")
+        print(f" └───────────────────────────────────────────────────┘")
+        
+    except Exception as e:
+        print(f"{ERR} {RED}حدث خطأ أثناء فحص الرقم: {e}{RESET}")
 
 # 17. Shellshock Scanner
 def shellshock_scan():
