@@ -18,13 +18,11 @@ A professional Python-based network scanning and system information tool.
 
 ## Installation
 
-```bash
-git clone https://github.com/YOUR_USERNAME/MyTool.git
+
+git clone https://github.com/Mohamedgarde46-Maker/MyTool.git
 cd MyTool
 chmod +x install.sh
 ./install.sh
-```
-
 ## Usage
 
 Run with Python:
