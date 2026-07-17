@@ -25,6 +25,7 @@ pip3 install arabic-reshaper python-bidi --break-system-packages
 mkdir -p /usr/share/mytool
 cp -r * /usr/share/mytool/
 
+
 # إنشاء أمر اختصار في النظام باسم mytool
 echo '#!/bin/bash' > /usr/local/bin/mytool
 echo 'cd /usr/share/mytool && python3 ku_netscan.py "$@"' >> /usr/local/bin/mytool
