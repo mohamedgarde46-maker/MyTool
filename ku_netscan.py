@@ -3,157 +3,128 @@ import os
 import sys
 import socket
 import subprocess
-import arabic_reshaper
-from bidi.algorithm import get_display
-from rich.console import Console
-from rich.table import Table
 
-# تهيئة شاشة التنسيق والألوان
-console = Console()
+# ألوان ANSI الكلاسيكية - مضمونة وتعمل على أي ترمينال بدون تشويه الخطوط
+GREEN = '\033[92m'
+RED = '\033[91m'
+YELLOW = '\033[93m'
+CYAN = '\033[96m'
+RESET = '\033[0m'
 
-# دالة مطورة ومضمونة لتصحيح عرض اللغة الكردية السورانية بدون خبط الحروف
-def fix_text(text):
-    reshaped = arabic_reshaper.reshape(text)
-    return get_display(reshaped)
-
-# 1. تصميم البانر الاحترافي للأداة
-BANNER = """
-[bold green]
+BANNER = f"""{GREEN}
   _  __       _   _      _                      
- | |/ /_  _  | \ | | ___| |_ ___  ___ __ _ _ __  
- | ' /| | | ||  \| |/ _ \ __/ __|/ __/ _` | '_ \ 
- | . \| |_| || |\  |  __/ |_\__ \ (_| (_| | | | |
- |_|\_\\__,_||_| \_|\___|\__|___/\___\__,_|_| |_|
-[/bold green]
- [bold blue]Multi-Tool Framework | Created by Mohamedgarde46-Maker[/bold blue]
+ | |/ /_  _  | \\ | | ___| |_ ___  ___ __ _ _ __  
+ | ' /| | | ||  \\| |/ _ \\ __/ __|/ __/ _` | '_ \\ 
+ | . \\| |_| || |\\  |  __/ |_\\__ \\ (_| (_| | | | |
+ |_|\\_\\\\__,_||_| \\_|\\___|\\__|___/\\___\\__,_|_| |_|
+{CYAN} [+] Multi-Tool Framework | Created by Mohamedgarde46-Maker {RESET}
 """
 
-def print_banner():
-    console.print(BANNER)
-
-# فحص صلاحيات الـ Root
 def check_root():
     if os.getuid() != 0:
-        console.print(f"[bold red] [-] {fix_text('تکایە ئامرازەکە وەک root کارپێبکە (sudo mytool)')}[/bold red]")
+        print(f"{RED}[-] تکایه ئامرازه که وه ک root کارپیبکه (sudo mytool){RESET}")
         sys.exit(1)
 
-# ─── الأداة الأولى: فحص الشبكة المحلية ──────────────────────────────────────────
+# 1. فحص الشبكة المحلية
 def network_scanner():
-    console.print(f"\n[bold yellow]» {fix_text('ئامرازی پشکنینی تۆڕ (Network Scanner)')}[/bold yellow]")
+    print(f"\n{YELLOW}>> ئامرازی پشکنینی تۆر (Network Scanner){RESET}")
     ip_range = input("Enter IP Range (e.g., 192.168.1.1/24): ").strip()
-    if not ip_range:
-        print("Invalid range!")
-        return
-    
-    console.print(f"[yellow]{fix_text('خەریکی پشکنینی تۆڕەکەم، تکایە چاوەڕوان بە...')}[/yellow]")
-    
-    # استخدام أمر arp-scan المدمج في كالي ليعطي نتائج حقيقية وسريعة للأجهزة المتصلة
-    try:
-        output = subprocess.check_output(f"arp-scan --interface=eth0 {ip_range} 2>/dev/null", shell=True).decode()
-        print(output)
-    except Exception:
-        # حل بديل في حال لم تكن الواجهة eth0
-        try:
-            output = subprocess.check_output(f"arp-scan -l 2>/dev/null", shell=True).decode()
-            print(output)
-        except Exception:
-            console.print(f"[red][-] {fix_text('تکایە دڵنیا بەرەوە کە arp-scan دابەزیوە لەسەر سیستمەکەت')}[/red]")
+    if not ip_range: return
+    print(f"{GREEN}[+] خەریکی پشکنینم، تکایە چاوەڕوان بە...{RESET}")
+    os.system(f"arp-scan --interface=eth0 {ip_range} 2>/dev/null || arp-scan -l")
 
-# ─── الأداة الثانية: فحص البورتات ──────────────────────────────────────────────
+# 2. فحص البورتات
 def port_scanner():
-    console.print(f"\n[bold yellow]» {fix_text('ئامرازی پشکنینی پۆرتەکان (Port Scanner)')}[/bold yellow]")
+    print(f"\n{YELLOW}>> ئامرازی پشکنینی پۆرتەکان (Port Scanner){RESET}")
     target = input("Enter target IP or Domain (e.g., google.com): ").strip()
     if not target: return
-
     try:
         target_ip = socket.gethostbyname(target)
-        console.print(f"[green][+] Target IP:[/green] {target_ip}")
+        print(f"{GREEN}[+] Target IP: {target_ip}{RESET}")
     except socket.gaierror:
-        console.print(f"[bold red][-] {fix_text('ناونیشانەکە هەڵەیە!')}[/bold red]")
+        print(f"{RED}[-] ناونیشانەکە هەڵەیە!{RESET}")
         return
 
-    common_ports = {
-        21: "FTP", 22: "SSH", 23: "Telnet", 25: "SMTP",
-        53: "DNS", 80: "HTTP", 110: "POP3", 443: "HTTPS",
-        3306: "MySQL", 8080: "HTTP-Proxy"
-    }
-
-    table = Table(title=fix_text("ئەنجامی پۆرتەکان"), title_style="bold cyan")
-    table.add_column("Port", style="magenta", justify="center")
-    table.add_column("Status", style="bold green", justify="center")
-    table.add_column("Service", style="blue", justify="center")
-
-    console.print(f"[yellow]{fix_text('خەریکی پشکنینم...')}[/yellow]")
+    common_ports = {21: "FTP", 22: "SSH", 80: "HTTP", 443: "HTTPS", 3306: "MySQL", 8080: "HTTP-Proxy"}
+    print("\nPort\tStatus\tService")
+    print("------------------------")
     for port, service in common_ports.items():
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.settimeout(1.0)
         result = s.connect_ex((target_ip, port))
         if result == 0:
-            table.add_row(str(port), "OPEN", service)
+            print(f"{GREEN}{port}\tOPEN\t{service}{RESET}")
         s.close()
-    console.print(table)
 
-# ─── الأداة الثالثة: استخراج الآي بي والمعلومات ─────────────────────────────────
+# 3. معرفة الآي بي
 def dns_lookup():
-    console.print(f"\n[bold yellow]» {fix_text('دۆزینەوەی ناونیشانی ئایپی (DNS Lookup)')}[/bold yellow]")
+    print(f"\n{YELLOW}>> دۆزینەوەی ناونیشانی ئایپی (DNS Lookup){RESET}")
     domain = input("Enter Domain Name (e.g., domain.com): ").strip()
     if not domain: return
-    
     try:
         ip = socket.gethostbyname(domain)
-        console.print(f"[bold green][+] IP Address for {domain} is: {ip}[/bold green]")
+        print(f"{GREEN}[+] IP Address for {domain} is: {ip}{RESET}")
     except socket.gaierror:
-        console.print(f"[bold red][-] {fix_text('نەتوانرا ئایپی بدۆزرێتەوە!')}[/bold red]")
+        print(f"{RED}[-] نەتوانرا ئایپی بدۆزرێتەوە!{RESET}")
 
-# ─── الأداة الرابعة: فحص الاتصال ───────────────────────────────────────────────
+# 4. فحص اتصال السيرفر
 def ping_tester():
-    console.print(f"\n[bold yellow]» {fix_text('پشکنینی بەستەر (Ping Tester)')}[/bold yellow]")
-    host = input("Enter Target IP/Domain to Ping: ").strip()
+    print(f"\n{YELLOW}>> پشکنینی بەستەر (Ping Tester){RESET}")
+    host = input("Enter Target IP/Domain: ").strip()
     if not host: return
-    
-    console.print(f"[yellow]{fix_text('خەریکی ناردنی پاکێتم...')}[/yellow]")
     response = os.system(f"ping -c 4 {host}")
     if response == 0:
-        console.print(f"[bold green][+] {fix_text('ئامێرەکە سەر هێڵە ومەبەست بەردەستە')}[/bold green]")
+        print(f"{GREEN}[+] ئامێرەکە سەر هێڵە ومەبەست بەردەستە{RESET}")
     else:
-        console.print(f"[bold red][-] {fix_text('ئامێرەکە دەرەوەی هێڵە!')}[/bold red]")
+        print(f"{RED}[-] ئامێرەکە دەرەوەی هێڵە!{RESET}")
 
-# ─── القائمة الرئيسية ─────────────────────────────────────────────────────────
+# 5. معلومات الدومين والموقع
+def whois_lookup():
+    print(f"\n{YELLOW}>> زانیاری دەربارەی دۆمەین (Whois Lookup){RESET}")
+    domain = input("Enter Domain Name (e.g., google.com): ").strip()
+    if not domain: return
+    print(f"{GREEN}[+] خەریکی هێنانی زانیاریم...{RESET}")
+    os.system(f"whois {domain} | grep -E 'Domain Name|Registrar|Creation Date|Expir'")
+
+# القائمة الرئيسية
 def main_menu():
     check_root()
     while True:
         os.system('clear')
-        print_banner()
-        
-        console.print(f"\n[bold cyan] {fix_text('تکایە ئامرازێک هەڵبژێرە:')}[/bold cyan]")
+        print(BANNER)
+        print(f"{CYAN} تکایە ئامرازێک هەڵبژێرە:{RESET}")
         print("------------------------------------------------")
-        print(f" 1. Network Scanner       ({fix_text('پشکنینی تۆڕ')})")
-        print(f" 2. Port Scanner          ({fix_text('پشکنینی پۆرت')})")
-        print(f" 3. DNS Lookup / IP Find  ({fix_text('دۆزینەوەی ئایپی')})")
-        print(f" 4. Ping Tester           ({fix_text('پشکنینی بەستەر')})")
-        print(f" 5. Exit                  ({fix_text('دەرچوون')})")
+        print(" 1. Network Scanner       (پشکنینی تۆر)")
+        print(" 2. Port Scanner          (پشکنینی پۆرت)")
+        print(" 3. DNS Lookup / IP Find  (دۆزینەوەی ئایپی)")
+        print(" 4. Ping Tester           (پشکنینی بەستەر)")
+        print(" 5. Whois Lookup          (زانیاری دۆمەین)")
+        print(" 6. Exit                  (دەرچوون)")
         print("------------------------------------------------")
         
         choice = input(" [?] Choose -> ").strip()
         
         if choice == '1':
             network_scanner()
-            input(fix_text("\nبۆ گەڕانەوە ئینتەر داگرە..."))
+            input("\nEnter بۆ گەڕانەوە...")
         elif choice == '2':
             port_scanner()
-            input(fix_text("\nبۆ گەڕانەوە ئینتەر داگرە..."))
+            input("\nEnter بۆ گەڕانەوە...")
         elif choice == '3':
             dns_lookup()
-            input(fix_text("\nبۆ گەڕانەوە ئینتەر داگرە..."))
+            input("\nEnter بۆ گەڕانەوە...")
         elif choice == '4':
             ping_tester()
-            input(fix_text("\nبۆ گەڕانەوە ئینتەر داگرە..."))
+            input("\nEnter بۆ گەڕانەوە...")
         elif choice == '5':
-            console.print(f"[bold green]\n[+] {fix_text('ماڵاوا! سوپاس بۆ بەکارهێنانی ئامرازەکە')}[/bold green]")
+            whois_lookup()
+            input("\nEnter بۆ گەڕانەوە...")
+        elif choice == '6':
+            print(f"{GREEN}\n[+] ماڵاوا! سوپاس بۆ بەکارهێنانی ئامرازەکە{RESET}")
             sys.exit(0)
         else:
-            console.print(f"[bold red][!] {fix_text('هەڵبژاردنەکە هەڵەیە!')}[/bold red]")
-            os.system('sleep 1.2')
+            print(f"{RED}[!] هەڵبژاردنەکە هەڵەیە!{RESET}")
+            os.system('sleep 1')
 
 if __name__ == "__main__":
     main_menu()
