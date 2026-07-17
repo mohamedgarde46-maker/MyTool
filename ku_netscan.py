@@ -6,7 +6,16 @@ import subprocess
 import urllib.request
 import json
 import re
-
+#!/usr/bin/python3
+import os
+import sys
+import socket
+import subprocess
+import urllib.request
+import json
+import re
+import phonenumbers
+from phonenumbers import geocoder, carrier
 # ألوان ورموز التنسيق الاحترافية
 GREEN  = '\033[92m'
 RED    = '\033[91m'
