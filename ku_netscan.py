@@ -30,7 +30,7 @@ BANNER = f"""{BOLD}{GREEN}
  | . \\| |_| | |  | (_| | \\__ \\ || (_| | | | |
  |_|\\_\\\\__,_|_|   \\__,_|_|___/\\__\\__,_|_| |_|
                                             
-{RESET}{BOLD}{CYAN}  ⚡ Kurdistan Ultimate Framework v3.0 | By Mohamedgarde46-Maker ⚡
+{RESET}{BOLD}{CYAN}  ⚡ Kurdistan Ultimate Framework v3.5 | By Mohamedgarde46-Maker ⚡
 {RESET}"""
 
 def check_root():
@@ -74,7 +74,7 @@ def port_scanner():
 
 # 3. DNS Lookup
 def dns_lookup():
-    print_header("DNS Lookup", "دۆزینەوەی ئایپی")
+    print_header("DNS Lookup", "دۆزینەوەی ئایپی سایت")
     domain = input(f" {INFO} Enter Domain Name: ").strip()
     if not domain: return
     try: print(f"{SUCC} IP for {domain} is: {BOLD}{GREEN}{socket.gethostbyname(domain)}{RESET}")
@@ -111,7 +111,7 @@ def network_count():
 
 # 8. Subdomain Scanner
 def subdomain_scanner():
-    print_header("Subdomain Scanner", "پشکنینی دۆمەین")
+    print_header("Subdomain Scanner", "پشکنینی دۆمەینی لاوەکی")
     domain = input(f" {INFO} Enter Domain: ").strip()
     if not domain: return
     subdomains = ['www', 'mail', 'ftp', 'admin', 'blog', 'cpanel', 'test', 'dev']
@@ -124,7 +124,7 @@ def subdomain_scanner():
 
 # 9. Header Security
 def header_checker():
-    print_header("Header Security", "پاراستنی سایت")
+    print_header("Header Security", "پشکنینی پاراستنی سایت")
     url = input(f" {INFO} Enter URL: ").strip()
     if not url.startswith("http"): url = "http://" + url
     try:
@@ -136,7 +136,7 @@ def header_checker():
 
 # 10. Admin Finder
 def admin_finder():
-    print_header("Admin Finder", "پانێڵی ئەدمین")
+    print_header("Admin Finder", "دۆزینەوەی پانێڵی ئەدمین")
     url = input(f" {INFO} Enter URL: ").strip()
     if not url.startswith("http"): url = "http://" + url
     for p in ['/admin', '/login', '/wp-admin', '/administrator']:
@@ -155,7 +155,7 @@ def subnet_calc():
 
 # 12. MAC Lookup
 def mac_lookup():
-    print_header("MAC Lookup", "ماک ئەدرەس")
+    print_header("MAC Lookup", "زانیاری ماک ئەدرەس")
     mac = input(f" {INFO} Enter MAC Address: ").strip()
     try:
         vendor = urllib.request.urlopen(f"https://api.macvendors.com/{mac}").read().decode()
@@ -164,7 +164,7 @@ def mac_lookup():
 
 # 13. Banner Grabbing
 def banner_grabbing():
-    print_header("Banner Grabbing", "جۆری سێرڤەر")
+    print_header("Banner Grabbing", "دیاریکردنی جۆری سێرڤەر")
     target = input(f" {INFO} Enter IP/Domain: ").strip()
     port_in = input(f" {INFO} Enter Port (Default 80): ").strip()
     port = int(port_in) if port_in.isdigit() else 80
@@ -182,60 +182,56 @@ def local_info():
     print(f" {SUCC} Hostname: {socket.gethostname()}")
     os.system("ip -br address")
 
-# 15. Cloudflare Bypass (جديد ومضمون)
+# 15. Cloudflare Bypass
 def cloudflare_bypass():
     print_header("Cloudflare Bypass", "دۆزینەوەی ئایپی ڕاستەقینە")
-    domain = input(f" {INFO} Enter Target Domain (e.g., target.com): ").strip()
+    domain = input(f" {INFO} Enter Target Domain: ").strip()
     if not domain: return
-    print(f"{INFO} Searching historical DNS records for Real IP...")
     os.system(f"dig +short cname {domain} && dig +short mx {domain}")
 
-# 16. Phone Info Lookup (جديد ومضمون)
+# 16. Phone Info Lookup
 def phone_lookup():
     print_header("Phone Lookup", "زانیاری ژمارەی تەلەفۆن")
-    phone = input(f" {INFO} Enter Phone Number with + (e.g., +964750xxxxxxx): ").strip()
+    phone = input(f" {INFO} Enter Phone Number: ").strip()
     if not phone: return
     try:
         res = urllib.request.urlopen(f"https://html.nu/api/phone.php?number={phone}").read().decode()
         print(f"{SUCC} Data: {GREEN}{res}{RESET}")
-    except:
-        print(f"{ERR} Service temporary unavailable or format wrong.")
+    except: print(f"{ERR} Error fetching phone data.")
 
-# 17. Shellshock Scanner (جديد ومضمون)
+# 17. Shellshock Scanner
 def shellshock_scan():
     print_header("Shellshock Scanner", "پشکنینی کلاود سێرڤەر")
-    target = input(f" {INFO} Enter Target URL/IP: ").strip()
+    target = input(f" {INFO} Enter Target IP: ").strip()
     if not target: return
     os.system(f"nmap -sV --script http-shellshock {target}")
 
-# 18. Directory Brute-Forcer (جديد ومضمون)
+# 18. Directory Brute-Forcer
 def dir_bruter():
     print_header("Directory Bruter", "پشکنینی بووشایی سایت")
     url = input(f" {INFO} Enter Target URL: ").strip()
     if not url.startswith("http"): url = "http://" + url
-    dirs = ['/backup.sql', '/.git', '/config.php', '/db.sql', '/uploads/', '/robots.txt']
-    print(f"{INFO} Brute-forcing hidden paths...\n")
+    dirs = ['/backup.sql', '/.git', '/config.php', '/robots.txt']
     for d in dirs:
         try:
-            if urllib.request.urlopen(url+d).code == 200: print(f" {SUCC} Found Path: {BOLD}{GREEN}{url+d}{RESET}")
+            if urllib.request.urlopen(url+d).code == 200: print(f" {SUCC} Found: {url+d}")
         except: pass
 
-# 19. Email Harvester (جديد ومضمون)
+# 19. Email Harvester
 def email_harvester():
     print_header("Email Harvester", "کۆکەرەوەی ئیمێڵ")
     domain = input(f" {INFO} Enter Target Domain: ").strip()
     if not domain: return
-    print(f"{INFO} Extracting target emails from public records...")
     os.system(f"curl -s 'https://crt.sh/?q=%25.{domain}' | grep -E -o '[A-Za-z0-9._%+-]+@{domain}' | sort -u")
 
-# 20. Firewall Detector (جديد ومضمون)
+# 20. Firewall Detector
 def firewall_detector():
     print_header("Firewall Detector", "پشکنینی دیواری ئاگرین")
-    target = input(f" {INFO} Enter Target Domain/IP: ").strip()
+    target = input(f" {INFO} Enter Target IP: ").strip()
     if not target: return
     os.system(f"nmap -sV --script http-waf-detect {target}")
 
-# القائمة الرئيسية المحدثة بـ 20 أداة كاملة
+# القائمة الرئيسية المحدثة بالكردية السورانية والإنجليزية معاً
 def main_menu():
     check_root()
     while True:
@@ -245,19 +241,19 @@ def main_menu():
         print(f" │            تکایە ئامرازێکی گونجاو هەڵبژێرە:            │")
         print(f" └────────────────────────────────────────────────────────┘{RESET}")
         
-        print(f"  {BOLD}{BLUE}[01]{RESET} Network Scanner      {BOLD}{BLUE}[11]{RESET} Subnet Calculator")
-        print(f"  {BOLD}{BLUE}[02]{RESET} Port Scanner         {BOLD}{BLUE}[12]{RESET} MAC Address Lookup")
-        print(f"  {BOLD}{BLUE}[03]{RESET} DNS Lookup           {BOLD}{BLUE}[13]{RESET} Port Banner Grabbing")
-        print(f"  {BOLD}{BLUE}[04]{RESET} Ping Tester          {BOLD}{BLUE}[14]{RESET} Local Network Info")
-        print(f"  {BOLD}{BLUE}[05]{RESET} Whois Lookup         {BOLD}{BLUE}[15]{RESET} Cloudflare Bypass")
-        print(f"  {BOLD}{BLUE}[06]{RESET} Device Scanner       {BOLD}{BLUE}[16]{RESET} Phone Info Lookup")
-        print(f"  {BOLD}{BLUE}[07]{RESET} Network Count        {BOLD}{BLUE}[17]{RESET} Shellshock Scanner")
-        print(f"  {BOLD}{BLUE}[08]{RESET} Subdomain Scanner    {BOLD}{BLUE}[18]{RESET} Directory Bruter")
-        print(f"  {BOLD}{BLUE}[09]{RESET} Header Security      {BOLD}{BLUE}[19]{RESET} Email Harvester")
-        print(f"  {BOLD}{BLUE}[10]{RESET} Admin Panel Finder   {BOLD}{BLUE}[20]{RESET} Firewall Detector")
-        print(f"  ───────────────────────────────────────────────────────────────")
+        print(f"  {BOLD}{BLUE}[01]{RESET} Network Scanner     (پشکنینی تۆر)         {BOLD}{BLUE}[11]{RESET} Subnet Calculator  (حسابکردنی تۆر)")
+        print(f"  {BOLD}{BLUE}[02]{RESET} Port Scanner        (پشکنینی پۆرت)        {BOLD}{BLUE}[12]{RESET} MAC Address Lookup (زانیاری ماک)")
+        print(f"  {BOLD}{BLUE}[03]{RESET} DNS Lookup          (ئایپی سایت)          {BOLD}{BLUE}[13]{RESET} Port Banner Grab   (جۆری سێرڤەر)")
+        print(f"  {BOLD}{BLUE}[04]{RESET} Ping Tester         (پشکنینی بەستەر)      {BOLD}{BLUE}[14]{RESET} Local Network Info (کارتەکانی تۆر)")
+        print(f"  {BOLD}{BLUE}[05]{RESET} Whois Lookup        (زانیاری دۆمەین)      {BOLD}{BLUE}[15]{RESET} Cloudflare Bypass  (ئایپی ڕاستەقینە)")
+        print(f"  {BOLD}{BLUE}[06]{RESET} Device Scanner      (پشکنینی ئامێرەکان)   {BOLD}{BLUE}[16]{RESET} Phone Info Lookup  (ژمارەی تەلەفۆن)")
+        print(f"  {BOLD}{BLUE}[07]{RESET} Network Count       (ژمارەی ئامێرەکان)    {BOLD}{BLUE}[17]{RESET} Shellshock Scanner (کلاود سێرڤەر)")
+        print(f"  {BOLD}{BLUE}[08]{RESET} Subdomain Scanner   (دۆمەینی لاوەکی)      {BOLD}{BLUE}[18]{RESET} Directory Bruter   (بووشایی سایت)")
+        print(f"  {BOLD}{BLUE}[09]{RESET} Header Security     (پاراستنی سایت)       {BOLD}{BLUE}[19]{RESET} Email Harvester    (کۆکەرەوەی ئیمێڵ)")
+        print(f"  {BOLD}{BLUE}[10]{RESET} Admin Panel Finder  (پانێڵی ئەدمین)       {BOLD}{BLUE}[20]{RESET} Firewall Detector  (دیواری ئاگرین)")
+        print(f"  ─────────────────────────────────────────────────────────────────────────────────────────")
         print(f"  {BOLD}{RED}[21] Exit (دەرچوون){RESET}")
-        print(f"  ───────────────────────────────────────────────────────────────")
+        print(f"  ─────────────────────────────────────────────────────────────────────────────────────────")
         
         choice = input(f"\n{BOLD}{CYAN} ┌─[ Kurdistan-Framework ]\n └─╼ # {RESET}").strip()
         
