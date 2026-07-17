@@ -25,7 +25,7 @@ def check_root():
         print(f"{RED}[-] تکایه ئامرازه که وه ک root کارپیبکه (sudo mytool){RESET}")
         sys.exit(1)
 
-# 1. فحص الشبكة المحلية
+# 1. فحص الشبكة المحلية العادي
 def network_scanner():
     print(f"\n{YELLOW}>> ئامرازی پشکنینی تۆر (Network Scanner){RESET}")
     ip_range = input("Enter IP Range (e.g., 192.168.1.1/24): ").strip()
@@ -86,6 +86,46 @@ def whois_lookup():
     print(f"{GREEN}[+] خەریکی هێنانی زانیاریم...{RESET}")
     os.system(f"whois {domain} | grep -E 'Domain Name|Registrar|Creation Date|Expir'")
 
+# 6. الأداة الجديدة: فحص الأجهزة (Device Scanner)
+def device_scanner():
+    print(f"\n{YELLOW}>> ئامرازی پشکنینی ئامێرەکان (Device Scanner){RESET}")
+    target = input("Enter Target IP (e.g., 192.168.1.5): ").strip()
+    if not target: return
+    print(f"{GREEN}[+] خەریکی پشکنینی قووڵی ئامێرەکەم...{RESET}")
+    # فحص نظام التشغيل التخميني للأجهزة عبر Ping TTL والمنفذ المفتوح
+    os.system(f"nmap -O -F {target} 2>/dev/null || nmap -F {target}")
+
+# 7. الأداة الجديدة: كم واحد على الشبكة (Network Users Count)
+def network_count():
+    print(f"\n{YELLOW}>> پشکنینی ژمارەی ئامێرەکان لەسەر تۆڕ (Network Count){RESET}")
+    print(f"{GREEN}[+] خەریکی پشکنینی سەرجەم تۆڕەکەم بۆ دۆزینەوەی هەموو ئامێرەکان...{RESET}")
+    
+    # الحصول على الآي بي الافتراضي للشبكة
+    try:
+        cmd = "ip route | grep default | awk '{print $3}'"
+        gateway = subprocess.check_output(cmd, shell=True).decode().strip()
+        network_prefix = ".".join(gateway.split(".")[:3]) + ".0/24"
+    except:
+        network_prefix = "192.168.1.0/24" # افتراضي في حال فشل التلقائي
+        
+    print(f"{CYAN}[*] Scanning Target Network: {network_prefix}{RESET}\n")
+    
+    # فحص صارم وعد الأجهزة المتصلة
+    output = subprocess.check_output(f"arp-scan --interface=eth0 {network_prefix} 2>/dev/null || arp-scan -l", shell=True).decode()
+    print(output)
+    
+    # حساب عدد الأجهزة المكتشفة في المخرجات
+    devices_count = 0
+    for line in output.split('\n'):
+        if "responded" in line or "packets received" in line:
+            continue
+        if any(char.isdigit() for char in line) and ":" in line:
+            devices_count += 1
+            
+    print("------------------------------------------------")
+    print(f"{GREEN}[+] سەرکەوتوو بوو! ژمارەی ئامێرەکان لەسەر تۆڕەکە: [ {devices_count} ] ئامێر{RESET}")
+    print("------------------------------------------------")
+
 # القائمة الرئيسية
 def main_menu():
     check_root()
@@ -99,7 +139,9 @@ def main_menu():
         print(" 3. DNS Lookup / IP Find  (دۆزینەوەی ئایپی)")
         print(" 4. Ping Tester           (پشکنینی بەستەر)")
         print(" 5. Whois Lookup          (زانیاری دۆمەین)")
-        print(" 6. Exit                  (دەرچوون)")
+        print(" 6. Device Scanner        (پشکنینی ئامێرەکان)")
+        print(" 7. Network Count         (ژمارەی ئامێرەکان)")
+        print(" 8. Exit                  (دەرچوون)")
         print("------------------------------------------------")
         
         choice = input(" [?] Choose -> ").strip()
@@ -120,6 +162,12 @@ def main_menu():
             whois_lookup()
             input("\nEnter بۆ گەڕانەوە...")
         elif choice == '6':
+            device_scanner()
+            input("\nEnter بۆ گەڕانەوە...")
+        elif choice == '7':
+            network_count()
+            input("\nEnter بۆ گەڕانەوە...")
+        elif choice == '8':
             print(f"{GREEN}\n[+] ماڵاوا! سوپاس بۆ بەکارهێنانی ئامرازەکە{RESET}")
             sys.exit(0)
         else:
