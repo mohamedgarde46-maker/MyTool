@@ -1,3 +1,11 @@
+import arabic_reshaper
+from bidi.algorithm import get_display
+
+def fix_kurdish_text(text):
+    # إعادت تشكيل الحروف لكي تتصل ببعضها
+    reshaped_text = arabic_reshaper.reshape(text)
+    # تعديل اتجاه النص من اليمين إلى اليسار
+    return get_display(reshaped_text)
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
