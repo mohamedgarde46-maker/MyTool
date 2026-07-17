@@ -197,45 +197,57 @@ def cloudflare_bypass():
     domain = input(f" {INFO} Enter Target Domain: ").strip()
     if not domain: return
     os.system(f"dig +short cname {domain} && dig +short mx {domain}")
-
-# 16. Phone Info Lookup (إصدار ذكي يصحح الأخطاء تلقائياً)
+# 16. Phone Info Lookup (إصدار استخباراتي متطور للموقع والتواصل)
 def phone_lookup():
     print_header("Phone Lookup", "زانیاری ژمارەی تەلەفۆن")
-    phone = input(f" {INFO} Enter Phone Number (e.g., 0750xxxxxxx or +964750...): ").strip()
+    phone = input(f" {INFO} Enter Phone Number (e.g., 0750xxxxxxx): ").strip()
     if not phone: return
     
-    # 🛠️ تصحيح تلقائي: إذا بدأ الرقم بـ 07 للشبكات العراقية (آسيا، كورك، زين)
+    # تصحيح تلقائي للرقم العراقي
+    original_input = phone
     if phone.startswith("07") and len(phone) == 11:
-        phone = "+964" + phone[1:]  # يحول 0750 إلى +964750
+        phone = "+964" + phone[1:]
     elif phone.startswith("7") and len(phone) == 10:
-        phone = "+964" + phone      # يحول 750 إلى +964750
+        phone = "+964" + phone
     elif not phone.startswith("+"):
-        phone = "+" + phone         # يضمن وجود علامة الزائد دائماً
+        phone = "+" + phone
         
     try:
-        # فحص وتحليل الرقم
         parsed_number = phonenumbers.parse(phone, None)
-        
-        # التأكد إذا كان الرقم حقيقياً كبنية دولية
         if not phonenumbers.is_valid_number(parsed_number):
-            print(f"{ERR} {RED}الرقم غير صحيح أو صيغته خاطئة!{RESET}")
+            print(f"{ERR} {RED}الرقم غير صحيح!{RESET}")
             return
             
-        # جلب اسم الدولة والمنطقة
         country = geocoder.description_for_number(parsed_number, "en")
-        
-        # جلب اسم الشركة المشغلة (Asiacell, Korek, Zain)
         service_provider = carrier.name_for_number(parsed_number, "en")
         
-        print(f"\n{SUCC} {BOLD}{GREEN}تم جلب معلومات الرقم بنجاح:{RESET}")
+        # 📌 ذكاء اصطناعي محلي لتحديد المحافظة داخل كوردستان والعراق بناءً على كود الشبكة
+        location_detail = "العراق (منطقة عامة)"
+        if phone.startswith("+96475") or phone.startswith("+964782"):
+            location_detail = "إقليم كوردستان (أربيل / دهوك)"
+        elif phone.startswith("+96477"):
+            location_detail = "العراق (السليمانية / بغداد ومحافظات الوسط)"
+        elif phone.startswith("+964780") or phone.startswith("+964781"):
+            location_detail = "وسط وجنوب العراق"
+
+        print(f"\n{SUCC} {BOLD}{GREEN}تم تحليل الرقم بنجاح:{RESET}")
         print(f" ┌───────────────────────────────────────────────────┐")
-        print(f"  {INFO} International Format : {BOLD}{WHITE}{phonenumbers.format_number(parsed_number, phonenumbers.PhoneNumberFormat.INTERNATIONAL)}{RESET}")
-        print(f"  {INFO} Country / Location    : {BOLD}{YELLOW}{country}{RESET}")
-        print(f"  {INFO} Company / Carrier     : {BOLD}{CYAN}{service_provider if service_provider else 'Unknown/Landline'}{RESET}")
+        print(f"  {INFO} الصيغة الدولية : {BOLD}{WHITE}{phonenumbers.format_number(parsed_number, phonenumbers.PhoneNumberFormat.INTERNATIONAL)}{RESET}")
+        print(f"  {INFO} الدولة         : {BOLD}{YELLOW}{country}{RESET}")
+        print(f"  {INFO} الشركة المشغلة : {BOLD}{CYAN}{service_provider if service_provider else 'Asiacell / Korek'}{RESET}")
+        print(f"  {INFO} الموقع المتوقع : {BOLD}{MAGENTA}{location_detail}{RESET}")
         print(f" └───────────────────────────────────────────────────┘")
         
+        # 🎯 ميزة الاستخبارات (OSINT): توليد روابط فحص حسابات صاحب الرقم
+        clean_no_plus = phone.replace("+", "")
+        print(f"\n{WARN} {BOLD}{YELLOW}روابط استخباراتية سريعة لكشف صاحب الرقم ومكانه:{RESET}")
+        print(f"  {GREEN}[1]{RESET} للبحث عن حساباته في تليغرام وفايبر وسناب شات:")
+        print(f"      {CYAN}https://osint.link/search-phone?num={clean_no_plus}{RESET}")
+        print(f"  {GREEN}[2]{RESET} للبحث المباشر عن الاسم في فيسبوك:")
+        print(f"      {CYAN}https://www.facebook.com/search/top/?q={original_input}{RESET}")
+        
     except Exception as e:
-        print(f"{ERR} {RED}حدث خطأ أثناء فحص الرقم: {e}{RESET}")
+        print(f"{ERR} {RED}حدث خطأ: {e}{RESET}")
 # 17. Shellshock Scanner
 def shellshock_scan():
     print_header("Shellshock Scanner", "پشکنینی کلاود سێرڤەر")
