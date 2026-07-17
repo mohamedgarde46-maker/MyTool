@@ -239,15 +239,16 @@ def dir_bruter():
         os.system("sudo apt-get install dirb -y")
     os.system(f"gobuster dir -u {domain} -w /usr/share/wordlists/dirb/common.txt -q")
 
-# [19] Email Harvester (مصححة لتعمل بالكامل عبر محرك كالي الاستخباراتي المضمون)
+## [19] Email Harvester (المصححة والمضمونة عبر المحركات المفتوحة)
 def email_harvester():
     print_header("Email Harvester", "کۆکەرەوەی ئیمێڵ")
-    domain = input(f" {INFO} Enter Target Domain: ").strip()
+    domain = input(f" {INFO} Enter Target Domain (e.g., korektel.com): ").strip()
     if not domain: return
     check_and_install("theHarvester", "theharvester")
-    print(f"\n{INFO} Scanning search engines for emails linked to {domain}...")
-    os.system(f"theHarvester -d {domain} -l 100 -b google")
-
+    print(f"\n{INFO} Scanning open source engines for emails linked to {domain}...")
+    
+    # استخدام محركات مجانية ومفتوحة ومضمونة 100% بدلاً من قوقل المحظور
+    os.system(f"theHarvester -d {domain} -l 100 -b bing,baidu,crtsh")
 # [20] Firewall Detector
 def firewall_detector():
     print_header("Firewall Detector", "دیواری ئاگرین")
