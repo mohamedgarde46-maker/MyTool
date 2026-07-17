@@ -1,4 +1,7 @@
+def network_scanner():
+    
 import arabic_reshaper
+
 from bidi.algorithm import get_display
 
 def fix_kurdish_text(text):
