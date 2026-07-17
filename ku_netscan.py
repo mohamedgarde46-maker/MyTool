@@ -1,4 +1,5 @@
-def network_scanner():
+
+
     
 import arabic_reshaper
 
@@ -64,9 +65,44 @@ BANNER = r"""
 [dim]  تەنها بۆ شبکەی خۆت یان بە مۆڵەت بەکاربهێنە | Authorized use only[/dim]
 """
 
+import socket
 
-def print_banner():
-    console.print(BANNER)
+def port_scanner():
+    target = input("Enter target IP or Domain (e.g. 192.168.1.1 or google.com): ")
+    try:
+        target_ip = socket.gethostbyname(target)
+        print(f"\n[+] Scanning target: {target} ({target_ip})")
+    except socket.gaierror:
+        print("\n[-] Error: Invalid hostname/IP.")
+        return
+
+    common_ports = {
+        21: "FTP",
+        22: "SSH",
+        23: "Telnet",
+        25: "SMTP",
+        53: "DNS",
+        80: "HTTP",
+        110: "POP3",
+        443: "HTTPS",
+        3306: "MySQL",
+        8080: "HTTP-Proxy"
+    }
+    
+    print("---------------------------------------")
+    print(" Port   |  Status  |  Service Name")
+    print("---------------------------------------")
+    
+    for port, service in common_ports.items():
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.settimeout(1.5)
+        result = s.connect_ex((target_ip, port))
+        if result == 0:
+            print(f" {port:<6} |  OPEN    |  {service}")
+        s.close()
+        
+    print("---------------------------------------")
+    print("[+] Scan finished successfully.")
 
 
 def check_root():
